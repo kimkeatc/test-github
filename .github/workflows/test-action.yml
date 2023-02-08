@@ -1,0 +1,48 @@
+name: Python-Template
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:        
+  job:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get commit date time
+        run: |
+          echo "COMMIT_DATETIME=$(git show -s --format=%ci)" >> $GITHUB_ENV
+
+      - name: Send email
+        run: |
+          python -c "pass; \
+          import email; \
+          import smtplib; \
+          
+          message = ''' \
+          Branch \"${{ github.ref_name }}\" updated on ${{ env.COMMIT_DATETIME }}. \n \
+          Link: ${{ github.server_url }}/${{ github.repository }}/tree/${{ github.ref_name }} \n \
+          Please merge your working branch with \"${{ github.ref_name }}\", if any. \
+          '''; \
+          
+          msg = email.message.EmailMessage(); \
+          msg.set_content('Email content'); \
+          msg['Subject'] = 'Email subject'; \
+          msg['From'] = 'kim.keat.chin@intel.com'; \
+          msg['To'] = 'kim.keat.chin@intel.com'; \
+          s = smtplib.SMTP('smtp.intel.com'); \
+          s.send_message(msg); \
+          s.quit(); \
+          "
