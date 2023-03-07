@@ -13,3 +13,4 @@ jobs:
       - name: Send email
         run: |
           echo hi
+          echo hi
